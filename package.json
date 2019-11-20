@@ -1,0 +1,26 @@
+{
+  "name": "freerep",
+  "version": "1.0.0",
+  "description": "Free repository",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/licurg/freerep.git"
+  },
+  "keywords": [
+    "freerep"
+  ],
+  "author": "Dmitriy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/licurg/freerep/issues"
+  },
+  "homepage": "https://github.com/licurg/freerep#readme"
+}
