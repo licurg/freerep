@@ -91,5 +91,5 @@ bot.on('callback_query', function (msg) {
   else {
     bot.answerCallbackQuery(msg.id, 'Благодарим тебя за ответы!', true);
   }
-  db.set(msg.data, parseInt(db.get(msg.data)) + 1);
+  db.set(msg.data, db.get(msg.data) + 1);
 });
