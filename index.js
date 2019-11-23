@@ -1,32 +1,42 @@
-// Dependencies
-const express = require('express');
-const app = express();
-const axios = require('axios');
-const bodyParser = require('body-parser');
-const port = 3000;
-const url = 'https://api.telegram.org/bot';
-const apiToken = '875658372:AAF9SD3Qs35MtlmTG0xvg2WaYNrbo_jTP-I';
-app.use(bodyParser.json());
-app.post('/', (req, res) => {
-    // console.log(req.body);
-    const chatId = req.body.message.chat.id;
-    const sentMessage = req.body.message.text;     // Regex for hello
-    if (sentMessage.match(/hello/gi)) {
-         axios.post(`${url}${apiToken}/sendMessage`,
-              {
-                   chat_id: chatId,
-                   text: 'hello back 👋'
-              })
-              .then((response) => { 
-                   res.status(200).send(response);
-              }).catch((error) => {
-                   res.send(error);
-              });
-    } else {
-         // if no hello present, just respond with 200 
-         res.status(200).send({});
-    }
+var TelegramBot = require('node-telegram-bot-api');
+const JSONdb = require('simple-json-db');
+const db = new JSONdb('./database.json');
+var token = '875658372:AAF9SD3Qs35MtlmTG0xvg2WaYNrbo_jTP-I';
+
+var bot = new TelegramBot(token, {polling: true});
+
+var questions = [
+  {
+    title:'Представь, что вместо плаката зеркало с предложением товара, который ты хочешь в данный момент. И магазин с товаром в этом же торговом центре!\n\nКруто?',
+    buttons: [
+        [{ text: 'Да!', callback_data: 'yes' }],
+        [{ text: 'Нет!', callback_data: 'no' }]
+      ]
+  }
+];
+
+function newQuestion(msg){
+  var arr = questions[0];
+  var text = arr.title;
+  var options = {
+    reply_markup: JSON.stringify({
+      inline_keyboard: arr.buttons
+    })
+  };
+  chat = msg.hasOwnProperty('chat') ? msg.chat.id : msg.from.id;
+  bot.sendMessage(chat, text, options);
+}
+
+bot.onText(/\/start/, function (msg, match) {
+  newQuestion(msg);
 });
-app.listen(port, () => {
-     console.log(`Listening on port ${port}`);
+
+bot.on('callback_query', function (msg) {
+    if (db.get(msg.from.id.toString()) == 'yes' || db.get(msg.from.id.toString()) == 'no') {
+        bot.answerCallbackQuery(msg.id, 'Спасибо, ты уже голосовал!', true);
+    }
+    else {
+        db.set(msg.from.id.toString(), msg.data);
+        bot.answerCallbackQuery(msg.id, 'Благодарим тебя за ответ!', true);
+    }
 });
